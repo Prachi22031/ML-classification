@@ -1,0 +1,223 @@
+# importing Panda and NumPy
+import pandas as pd
+import numpy as np
+df=pd.read_csv(r"data.csv")
+#Data Cleaning
+df=df.drop(['firstDay','lastDay'],axis=1)
+display(df)
+df.info()
+#Exploratory Data Analysis
+df.head()
+df.shape
+df.columns
+for i in df.columns:
+    print(df[i].unique())
+    print()
+df.describe()
+df['C_api'].value_counts()
+import matplotlib.pyplot as plt
+plt.pie(df['C_api'].value_counts(), labels=['unknown','male','female'],autopct="%0.2f")
+plt.show()
+import seaborn as sns
+# Plotting heatmap
+fig,ax=plt.subplots(figsize=(14,10))
+sns.heatmap(df.corr(),annot=True,cmap='coolwarm',square=True)
+plt.show
+# Giving numerical value to textual data
+from sklearn import preprocessing
+encoder=preprocessing.LabelEncoder()
+df['C_api']=encoder.fit_transform(df['C_api'])
+X=df.iloc[:,0:19]
+y=df.iloc[:,1]
+X.head()
+y.head()
+#Model Building
+from sklearn.model_selection import train_test_split
+
+from sklearn.naive_bayes import GaussianNB,MultinomialNB,BernoulliNB
+from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score,classification_report
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.20,random_state=2)
+
+gnb = GaussianNB()
+mnb = MultinomialNB()
+bnb = BernoulliNB()
+def perform(y_pred):
+  print("Accuracy : ", accuracy_score(y_test, y_pred))
+  print("Precision : ", precision_score(y_test, y_pred, average = 'micro'))
+  print("Recall : ", recall_score(y_test, y_pred, average = 'micro'))
+  print("F1 Score : ", f1_score(y_test, y_pred, average = 'micro'))
+gnb.fit(X_train,y_train)
+y_pred1 = gnb.predict(X_test)
+perform(y_pred1)
+mnb.fit(X_train,y_train)
+y_pred2 = mnb.predict(X_test)
+perform(y_pred2)
+bnb.fit(X_train,y_train)
+y_pred3 = bnb.predict(X_test)
+perform(y_pred3)
+#best --> GNB
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
+gnb = GaussianNB()
+svc = SVC(kernel='sigmoid', gamma='scale')
+lrc = LogisticRegression(solver='liblinear', penalty='l1')
+knc = KNeighborsClassifier()
+rfc = RandomForestClassifier(n_estimators=20, random_state=2)
+clfs = {
+    'Naive bayes ': gnb,
+    'Support Vector Machine' : svc,
+    'Logistic Regression': lrc,
+    'K-Nearest Neighbour' : knc,
+    'Random Forest': rfc
+}
+def score_find(y_test,y_pred):
+    Accuracy = accuracy_score(y_test,y_pred)
+    Precision = precision_score(y_test,y_pred,average = 'micro')
+    Recall = recall_score(y_test, y_pred, average = 'micro')
+    F1_score = f1_score(y_test, y_pred, average = 'micro')
+
+    return Accuracy,Precision,Recall,F1_score
+accuracy_scores = []
+precision_scores = []
+recall_scores = []
+f1_scores = []
+print("For Gaussian Naive Bayes")
+gnb.fit(X_train,y_train)
+y_pred = gnb.predict(X_test)
+cm = confusion_matrix(y_test, y_pred)
+print()
+print("**"*27 + "\n" + " "* 16 + "Classification Report\n" + "**"*27)
+print(classification_report(y_test, y_pred))
+print("**"*27+"\n")
+
+current_accuracy,current_precision,current_recall,current_F1 = score_find(y_test,y_pred)
+
+print("Accuracy - ",current_accuracy)
+print("Precision - ",current_precision)
+print("Recall - ",current_recall)
+print("F1_score - ",current_F1)
+print()
+
+cm1 = ConfusionMatrixDisplay(confusion_matrix = cm, display_labels=['male','unkown','female'])
+cm1.plot()
+
+accuracy_scores.append(current_accuracy)
+precision_scores.append(current_precision)
+recall_scores.append(current_recall)
+f1_scores.append(current_F1)
+
+print("For Support Vector Machine")
+svc.fit(X_train,y_train)
+y_pred = svc.predict(X_test)
+cm = confusion_matrix(y_test, y_pred)
+print()
+print("**"*27 + "\n" + " "* 16 + "Classification Report\n" + "**"*27)
+print(classification_report(y_test, y_pred))
+print("**"*27+"\n")
+
+current_accuracy,current_precision,current_recall,current_F1 = score_find(y_test,y_pred,)
+
+print("Accuracy - ",current_accuracy)
+print("Precision - ",current_precision)
+print("Recall - ",current_recall)
+print("F1_score - ",current_F1)
+print()
+
+cm1 = ConfusionMatrixDisplay(confusion_matrix = cm, display_labels=['male','unkown','female'])
+cm1.plot()
+
+accuracy_scores.append(current_accuracy)
+precision_scores.append(current_precision)
+recall_scores.append(current_recall)
+f1_scores.append(current_F1)
+
+print("For Logistic Regression")
+lrc.fit(X_train,y_train)
+y_pred = lrc.predict(X_test)
+cm = confusion_matrix(y_test, y_pred)
+print()
+print("**"*27 + "\n" + " "* 16 + "Classification Report\n" + "**"*27)
+print(classification_report(y_test, y_pred))
+print("**"*27+"\n")
+
+current_accuracy,current_precision,current_recall,current_F1 = score_find(y_test,y_pred)
+
+print("Accuracy - ",current_accuracy)
+print("Precision - ",current_precision)
+print("Recall - ",current_recall)
+print("F1_score - ",current_F1)
+print()
+
+cm1 = ConfusionMatrixDisplay(confusion_matrix = cm, display_labels=['male','unkown','female'])
+cm1.plot()
+
+accuracy_scores.append(current_accuracy)
+precision_scores.append(current_precision)
+recall_scores.append(current_recall)
+f1_scores.append(current_F1)
+
+print("For K-Nearest Neighbour")
+knc.fit(X_train,y_train)
+y_pred = knc.predict(X_test)
+cm = confusion_matrix(y_test, y_pred)
+print()
+print("**"*27 + "\n" + " "* 16 + "Classification Report\n" + "**"*27)
+print(classification_report(y_test, y_pred))
+print("**"*27+"\n")
+
+current_accuracy,current_precision,current_recall,current_F1 = score_find(y_test,y_pred)
+
+print("Accuracy - ",current_accuracy)
+print("Precision - ",current_precision)
+print("Recall - ",current_recall)
+print("F1_score - ",current_F1)
+print()
+
+cm1 = ConfusionMatrixDisplay(confusion_matrix = cm, display_labels=['male', 'unkown','female'])
+cm1.plot()
+
+accuracy_scores.append(current_accuracy)
+precision_scores.append(current_precision)
+recall_scores.append(current_recall)
+f1_scores.append(current_F1)
+
+print("For Random Forest")
+rfc.fit(X_train,y_train)
+y_pred = rfc.predict(X_test)
+cm = confusion_matrix(y_test, y_pred)
+print()
+print("**"*27 + "\n" + " "* 16 + "Classification Report\n" + "**"*27)
+print(classification_report(y_test, y_pred))
+print("**"*27+"\n")
+
+current_accuracy,current_precision,current_recall,current_F1 = score_find(y_test,y_pred)
+
+print("Accuracy - ",current_accuracy)
+print("Precision - ",current_precision)
+print("Recall - ",current_recall)
+print("F1_score - ",current_F1)
+print()
+
+cm1 = ConfusionMatrixDisplay(confusion_matrix = cm, display_labels=['male','unkown','female'])
+cm1.plot()
+
+accuracy_scores.append(current_accuracy)
+precision_scores.append(current_precision)
+recall_scores.append(current_recall)
+f1_scores.append(current_F1)
+
+performance_df = pd.DataFrame({'Algorithm':clfs.keys(),'Accuracy':accuracy_scores,'Precision':precision_scores,
+                               'Recall':recall_scores,'F1_Score':f1_scores}).sort_values('Precision',ascending=True)
+performance_df
+performance_df1 = pd.melt(performance_df, id_vars = "Algorithm")
+performance_df1
+sns.catplot(x = 'Algorithm', y='value',
+               hue = 'variable',data=performance_df1, kind='bar',height=5)
+plt.ylim(0.5,1.0)
+plt.xticks(rotation='vertical')
+plt.show()
